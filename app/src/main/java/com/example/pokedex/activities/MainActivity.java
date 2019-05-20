@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,14 +55,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String IMAGE_DIRECTORY_NAME = "Pictures";
 
-    private Button bCamera;
-    private Button bAnalisar;
     private ImageView iFotoPokemon;
     private ImageView iBackBottom;
     private ImageView iBackTop;
     private GifImageView gITop;
-    private ProgressBar pBAnalizando;
-    private TextView tResultado;
+    private RelativeLayout mainScreen;
 
     private Uri uriImage;
 
@@ -71,10 +69,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         iFotoPokemon = findViewById(R.id.imagem);
-
-        pBAnalizando = findViewById(R.id.pb_analizando);
-
-        tResultado = findViewById(R.id.texto_resultado);
 
         iBackTop = findViewById(R.id.background_topo);
 
@@ -89,22 +83,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        bCamera = findViewById(R.id.botao_camera);
-        bCamera.setOnClickListener(new View.OnClickListener() {
+        mainScreen = findViewById(R.id.main_screen);
+        mainScreen.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
-                //Imagem da galeria
-//                if (checkSelfPermission()){
-//
-//                    Intent intent = new Intent();
-//                    intent.setType("image/*");
-//                    intent.setAction(Intent.ACTION_GET_CONTENT);
-//
-//                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE_GALERY);
-//                }
-
-                //Camera
+            public void onClick(View v) {
 
                 if (checkSelfPermission()) {
 
@@ -149,84 +131,148 @@ public class MainActivity extends AppCompatActivity {
 
                     }
                 }
-            }
-        });
-
-        bAnalisar = findViewById(R.id.botao_analisar);
-        bAnalisar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //testTouchEvent();
-
-                pBAnalizando.setVisibility(View.VISIBLE);
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        File file = createFileFromURI(uriImage);
-
-                        runOnUiThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                iBackTop.setVisibility(View.GONE);
-                            }
-                        });
-
-                        Log.d(MainActivity.class.getName(),"Enviando arquivo pro servidor");
-                        Ion.with(getApplicationContext())
-                            .load("https://pokemon.onrender.com/analyze")
-                            .setMultipartFile("file", "image/*", file)
-                            .asJsonObject()
-                            .setCallback(new FutureCallback<JsonObject>() {
-                                @Override
-                                public void onCompleted(Exception e, JsonObject result) {
-                                    if(result!= null){
-
-                                        toRigth(result.get("result").getAsString());
-
-                                        Log.d(MainActivity.class.getName(),result.get("result").getAsString());
-                                        final String resultado = result.get("result").getAsString();
-
-                                        runOnUiThread(new Runnable() {
-
-                                            @Override
-                                            public void run() {
-                                                pBAnalizando.setVisibility(View.GONE);
-                                                tResultado.setText(resultado);
-                                            }
-                                        });
-
-                                    }else{
-                                        Log.d("oi","nulo");
-                                    }
-                                }
-                            });
-
-                    }
-
-                }).start();
 
             }
         });
+
+//        bCamera = findViewById(R.id.botao_camera);
+//        bCamera.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                //Imagem da galeria
+////                if (checkSelfPermission()){
+////
+////                    Intent intent = new Intent();
+////                    intent.setType("image/*");
+////                    intent.setAction(Intent.ACTION_GET_CONTENT);
+////
+////                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_IMAGE_GALERY);
+////                }
+//
+//                //Camera
+//
+//                if (checkSelfPermission()) {
+//
+//                    if (getApplicationContext().getPackageManager().hasSystemFeature(
+//                            PackageManager.FEATURE_CAMERA)) { // this device has a camera
+//
+//                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//
+//                        File mediaStorageDir = new File(
+//                                Environment
+//                                        .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+//                                IMAGE_DIRECTORY_NAME);
+//
+//                        // Create the storage directory if it does not exist
+//                        if (!mediaStorageDir.exists()) {
+//                            if (!mediaStorageDir.mkdirs()) {
+//                                Log.d(this.getClass().getName(), "Oops! Failed create "
+//                                        + IMAGE_DIRECTORY_NAME + " directory");
+//                            }else{
+//                                //Log.d(this.getClass().getName(), "Criou" + IMAGE_DIRECTORY_NAME + " directory");
+//                            }
+//                        }else{
+//                            //Log.d(this.getClass().getName(), "exixte o diretório");
+//                        }
+//
+//                        // Create a media file name
+//                        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",
+//                                Locale.getDefault()).format(new Date());
+//
+//                        File file = new File(mediaStorageDir.getPath() + File.separator
+//                                + "IMG_" + timeStamp + ".jpg");
+//
+//
+//                        uriImage = FileProvider.getUriForFile(
+//                                getApplicationContext(),
+//                                getApplicationContext().getPackageName()+".fileprovider",
+//                                file);
+//
+//                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImage);
+//
+//                        startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+//
+//                    }
+//                }
+//            }
+//        });
+
+//        bAnalisar = findViewById(R.id.botao_analisar);
+//        bAnalisar.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                //testTouchEvent();
+//
+//                pBAnalizando.setVisibility(View.VISIBLE);
+//
+//                new Thread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        File file = createFileFromURI(uriImage);
+//
+//                        runOnUiThread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                iBackTop.setVisibility(View.GONE);
+//                            }
+//                        });
+//
+//                        Log.d(MainActivity.class.getName(),"Enviando arquivo pro servidor");
+//                        Ion.with(getApplicationContext())
+//                            .load("https://pokemon.onrender.com/analyze")
+//                            .setMultipartFile("file", "image/*", file)
+//                            .asJsonObject()
+//                            .setCallback(new FutureCallback<JsonObject>() {
+//                                @Override
+//                                public void onCompleted(Exception e, JsonObject result) {
+//                                    if(result!= null){
+//
+//                                        toRigth(result.get("result").getAsString());
+//
+//                                        Log.d(MainActivity.class.getName(),result.get("result").getAsString());
+//                                        final String resultado = result.get("result").getAsString();
+//
+//                                        runOnUiThread(new Runnable() {
+//
+//                                            @Override
+//                                            public void run() {
+//                                                pBAnalizando.setVisibility(View.GONE);
+//                                                tResultado.setText(resultado);
+//                                            }
+//                                        });
+//
+//                                    }else{
+//                                        Log.d("oi","nulo");
+//                                    }
+//                                }
+//                            });
+//
+//                    }
+//
+//                }).start();
+//
+//            }
+//        });
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        int[] location = new int[2];
-        bCamera.getLocationInWindow(location);
-        Log.d(MainActivity.class.getName(),
-                "view point x,y (" + location[0]+ ", " + location[1] + ")");
-
-        int x = location[0] + bCamera.getWidth() / 2;
-        int y = location[1] + bCamera.getHeight() / 2;
-
-        Log.d(MainActivity.class.getName(),
-                "centro point x,y (" + x+ ", " + y + ")");
+//        int[] location = new int[2];
+//        bCamera.getLocationInWindow(location);
+//        Log.d(MainActivity.class.getName(),
+//                "view point x,y (" + location[0]+ ", " + location[1] + ")");
+//
+//        int x = location[0] + bCamera.getWidth() / 2;
+//        int y = location[1] + bCamera.getHeight() / 2;
+//
+//        Log.d(MainActivity.class.getName(),
+//                "centro point x,y (" + x+ ", " + y + ")");
     }
 
     private boolean checkSelfPermission (){
@@ -293,6 +339,53 @@ public class MainActivity extends AppCompatActivity {
 
                     iFotoPokemon.setVisibility(View.VISIBLE);
                     iFotoPokemon.setImageURI(uriImage);
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            File file = createFileFromURI(uriImage);
+
+                            runOnUiThread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    iBackTop.setVisibility(View.GONE);
+                                }
+                            });
+
+                            Log.d(MainActivity.class.getName(),"Enviando arquivo pro servidor");
+                            Ion.with(getApplicationContext())
+                                    .load("https://pokemon.onrender.com/analyze")
+                                    .setMultipartFile("file", "image/*", file)
+                                    .asJsonObject()
+                                    .setCallback(new FutureCallback<JsonObject>() {
+                                        @Override
+                                        public void onCompleted(Exception e, JsonObject result) {
+                                            if(result!= null){
+
+                                                toRigth(result.get("result").getAsString());
+
+                                                runOnUiThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        iBackTop.setVisibility(View.VISIBLE);
+                                                    }
+                                                });
+
+
+
+                                                Log.d(MainActivity.class.getName(),result.get("result").getAsString());
+
+                                            }else{
+                                                Log.d("oi","nulo");
+                                            }
+                                        }
+                                    });
+
+                        }
+
+                    }).start();
 
                 }else if(resultCode == RESULT_CANCELED){
                     Toast.makeText(getApplicationContext(),
@@ -408,49 +501,5 @@ public class MainActivity extends AppCompatActivity {
 //        Log.d(MainActivity.class.getName(),cursor.getString(column_index));
 //        return cursor.getString(column_index);
 //    }
-
-    private void getScreenSize(){
-        Display display = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int width = size.x;
-        int height = size.y;
-        Log.d("Width", "" + width);// 1080
-        Log.d("height", "" + height);// 1920
-    }
-
-    private void testTouchEvent(){
-
-        try{
-
-            String methodName = "getInstance";
-            Object[] objArr = new Object[0];
-            InputManager im = (InputManager) InputManager.class.getDeclaredMethod(methodName, new Class[0])
-                    .invoke(null, objArr);
-
-            //Make MotionEvent.obtain() method accessible
-            methodName = "obtain";
-            MotionEvent.class.getDeclaredMethod(methodName, new Class[0]).setAccessible(true);
-
-            //Get the reference to injectInputEvent method
-            methodName = "injectInputEvent";
-            Method injectInputEventMethod = InputManager.class.getMethod(methodName, new Class[]{InputEvent.class, Integer.TYPE});
-
-            long when = SystemClock.uptimeMillis();
-            int source = InputDeviceCompat.SOURCE_TOUCHSCREEN;
-            float pressure = 1.0f;
-            MotionEvent event = MotionEvent.obtain(when, when, MotionEvent.ACTION_UP, 292, 1656, pressure, 1.0f, 0, 1.0f, 1.0f, 0, 0);
-            Log.d(MainActivity.class.getName(), event.toString());
-            event.setSource(source);
-            injectInputEventMethod.invoke(im, new Object[]{event, Integer.valueOf(0)});
-
-        }catch (Exception e){
-
-        }
-
-
-
-        Log.d(MainActivity.class.getName(), "Tocou a tela");
-    }
 
 }
